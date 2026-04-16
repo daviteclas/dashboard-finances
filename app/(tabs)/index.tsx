@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { SummaryCard } from "@/components/SummaryCard";
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { router } from "expo-router";
@@ -6,6 +7,12 @@ import { TransactionCard } from "../../components/TransactionCard";
 
 export default function HomeScreen() {
   const transactions = useTransactionStore((state) => state.transactions);
+
+  const loadTransactions = useTransactionStore((state) => state.loadTransaction);
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
 
   return (
     <View style={styles.container}>
