@@ -5,7 +5,8 @@ import { create } from "zustand";
 interface TransactionStore {
   transactions: Transaction[];
   addTransaction: (newTransaction: Omit<Transaction, "id" | "date">) => void;
-  loadTransaction: () => Promise<void>
+  loadTransaction: () => Promise<void>;
+  deleteTransaction: ( id:string ) => Promise<void>;
 }
 
 export const useTransactionStore = create<TransactionStore>((set) => ({
@@ -36,5 +37,15 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
     } catch(error) {
       console.error("Erro ao carregar: ", error)
     }
-  }
+  },
+
+  deleteTransaction : async (id) => {
+    set((state) => {
+      const novasTransacoes = state.transactions.filter((t) => t.id !== id);
+
+      AsyncStorage.setItem('@meu_dashboard_transactions', JSON.stringify(novasTransacoes));
+
+      return { transactions: novasTransacoes }
+    })
+  },
 }));

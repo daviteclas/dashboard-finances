@@ -1,6 +1,13 @@
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { router, useLocalSearchParams } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 interface Transaction {
   id: string;
@@ -11,10 +18,13 @@ interface Transaction {
 }
 
 export default function TransactionDetailsScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
 
   const transactions = useTransactionStore((state) => state.transactions);
-  
-  const { id } = useLocalSearchParams<{ id: string }>();
+
+  const deleteTransaction = useTransactionStore(
+    (state) => state.deleteTransaction,
+  );
 
   const transaction = transactions.find((t) => t.id === id);
 
@@ -35,6 +45,35 @@ export default function TransactionDetailsScreen() {
     );
   }
 
+  function handleDelete() {
+    if (Platform.OS === "web") {
+      const confirmou = window.confirm(
+        `Tem certeza que deseja apagar a transação "${transaction?.title}"?`,
+      );
+      if (confirmou) {
+        deleteTransaction(id);
+        router.back();
+      }
+      return;
+    }
+
+    Alert.alert(
+      "Excluir Transação",
+      `Tem certeza que deseja apagar a transação "${transaction.title}"?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () => {
+            deleteTransaction(id);
+            router.back();
+          },
+        },
+      ],
+    );
+  }
+
   const formattedAmount = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -43,8 +82,10 @@ export default function TransactionDetailsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.label}>Descrição</Text>
+        <Text style={styles.label}>Título</Text>
         <Text style={styles.title}>{transaction.title}</Text>
+
+        <View style={styles.divider} />
 
         <Text style={styles.label}>Valor</Text>
         <Text
@@ -58,9 +99,23 @@ export default function TransactionDetailsScreen() {
           {transaction.type === "expense" ? "- " : "+ "}
           {formattedAmount}
         </Text>
+
+        <View style={styles.divider} />
+
         <Text style={styles.label}>Data do Registro</Text>
         <Text style={styles.date}>{transaction.date}</Text>
       </View>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.deleteButton,
+          pressed && { opacity: 0.8 },
+        ]}
+        onPress={handleDelete}
+      >
+        <Text style={styles.deleteButtonText}>Excluir Transação</Text>
+      </Pressable>
+
       <Pressable
         style={({ pressed }) => [
           styles.button,
@@ -146,5 +201,23 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#F4F4F5",
+    marginVertical: 16,
+  },
+  deleteButton: {
+    backgroundColor: "#EF4444", // Vermelho de alerta
+    height: 56,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  deleteButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
