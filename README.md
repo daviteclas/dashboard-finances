@@ -1,50 +1,41 @@
-# Welcome to your Expo app 👋
+# 💰 FinDash - Seu Dashboard Financeiro Pessoal
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![Status do Projeto](https://img.shields.io/badge/Status-Concluído-success)
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat&logo=react&logoColor=61DAFB)
+![Expo](https://img.shields.io/badge/Expo-1B1F23?style=flat&logo=expo&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-Bear-orange)
 
-## Get started
+> Um aplicativo mobile moderno e performático para controle de finanças pessoais, com cálculo de saldo em tempo real e persistência de dados local. Construído com foco em arquitetura limpa e UX preventiva.
 
-1. Install dependencies
+## ✨ Funcionalidades
 
-   ```bash
-   npm install
-   ```
+- **Visão Geral Intuitiva:** Dashboard central com cálculo automático de Entradas, Saídas e Saldo Total (Estado Derivado).
+- **Gestão de Transações:** Criação, listagem e exclusão de transações com feedback visual imediato.
+- **Busca Dinâmica:** Filtro instantâneo de transações pelo título diretamente na memória.
+- **Persistência de Dados (Offline-first):** Suas informações estão seguras no seu dispositivo, mesmo se fechar o app, utilizando AsyncStorage.
+- **UX Preventiva:** Validação de formulários em tempo real (Zod) e alertas de confirmação para ações destrutivas (exclusão).
+- **Navegação Fluida:** Sistema de roteamento baseado em arquivos com Expo Router, incluindo tabs e telas de modal/stack.
+- **Cross-Platform:** Funciona perfeitamente em iOS, Android e Web.
 
-2. Start the app
+## 🛠️ Tecnologias e Decisões Arquiteturais
 
-   ```bash
-   npx expo start
-   ```
+- **[React Native](https://reactnative.dev/) & [Expo](https://expo.dev/):** Base do desenvolvimento ágil e universal.
+- **[Expo Router](https://docs.expo.dev/router/introduction/):** Navegação moderna baseada em arquivos (File-based routing), eliminando a complexidade do React Navigation clássico.
+- **[Zustand](https://github.com/pmndrs/zustand):** Gerenciamento de estado global escolhido pela sua simplicidade, performance e baixo boilerplate (dispensando a burocracia do Redux).
+- **[React Hook Form](https://react-hook-form.com/) & [Zod](https://zod.dev/):** Casamento perfeito para formulários de alta performance e validação estrita de dados no lado do cliente.
+- **[AsyncStorage](https://react-native-async-storage.github.io/async-storage/):** Escolhido para garantir que o ciclo de dados (CRUD) seja persistido localmente de forma segura e sem custos de banco de dados na nuvem.
 
-In the output, you'll find options to open the app in a
+## 🚀 Como executar o projeto
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Pré-requisitos
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Node.js instalado (Recomendado v18 ou v20 LTS)
+- Aplicativo **Expo Go** instalado no seu celular (iOS ou Android)
 
-## Get a fresh project
+👨‍💻 Autor
+Criado por Davi Andrade
 
-When you're ready, run:
+LinkedIn: https://www.linkedin.com/in/dev-davi/
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+GitHub: https://github.com/daviteclas

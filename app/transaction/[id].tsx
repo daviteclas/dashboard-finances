@@ -59,7 +59,7 @@ export default function TransactionDetailsScreen() {
 
     Alert.alert(
       "Excluir Transação",
-      `Tem certeza que deseja apagar a transação "${transaction.title}"?`,
+      `Tem certeza que deseja apagar a transação "${transaction?.title}"?`,
       [
         { text: "Cancelar", style: "cancel" },
         {
