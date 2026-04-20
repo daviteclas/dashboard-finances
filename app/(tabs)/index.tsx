@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { SummaryCard } from "@/components/SummaryCard";
 import { useTransactionStore } from "@/store/useTransactionStore";
 import { router } from "expo-router";
-import { FlatList, StyleSheet, Text, View, TextInput } from "react-native";
+import { View, FlatList, StyleSheet, Text, TextInput, Pressable } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { TransactionCard } from "../../components/TransactionCard";
 import { Ionicons } from '@expo/vector-icons';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { useThemeStore } from '@/store/useThemeStore';
+
 
 export default function HomeScreen() {
   const transactions = useTransactionStore((state) => state.transactions);
@@ -12,17 +16,57 @@ export default function HomeScreen() {
   const loadTransactions = useTransactionStore((state) => state.loadTransaction);
 
   const [searchText, setSearchText] = useState('');
-
   const filteredTransactions = transactions.filter((t) => 
     t.title.toLowerCase().includes(searchText.toLocaleLowerCase())
   )
 
+  const { theme, activeMode } = useAppTheme();
+  const setThemeMode = useThemeStore((state) => state.setThemeMode);
+  const loadTheme = useThemeStore((state) => state.loadTheme)
+
   useEffect(() => {
     loadTransactions();
+    loadTheme();
   }, []);
 
+  function toggleTheme() {
+    const { themeMode } = useThemeStore.getState();
+    if (themeMode === 'system') setThemeMode('dark');
+    else if (themeMode === 'dark') setThemeMode('light');
+    else setThemeMode('system');
+  }
+
+  const currentThemeMode = useThemeStore((state) => state.themeMode);
+
+  const getThemeIcon = () => {
+    if (currentThemeMode === 'dark') return 'moon';
+    if (currentThemeMode === 'light') return 'sunny';
+    return 'contrast';
+  }
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', color: theme.text }}>
+          FinDash
+        </Text>
+
+        <Pressable 
+          onPress={toggleTheme} 
+          style={{ 
+            width: 40,
+            height: 40,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: theme.card, 
+            borderRadius: 20, 
+            borderWidth: 1, 
+            borderColor: theme.border 
+          }} 
+        >
+          <Ionicons name={getThemeIcon()} size={20} color={theme.text} />
+        </Pressable>
+      </View>
       {transactions.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
@@ -31,12 +75,11 @@ export default function HomeScreen() {
         </View>
       ) : (
         <>
-
           <SummaryCard />
-          <View style={styles.searchContainer}>
+          <View style={[styles.searchContainer, { backgroundColor: theme.card }]}>
             <Ionicons name="search" size={20} color="#A1A1AA" style={styles.searchIcon} />
             <TextInput 
-              style={styles.searchInputWithIcon}
+              style={[styles.searchInputWithIcon, { color: theme.text }]}
               value={searchText}
               onChangeText={setSearchText}
               placeholder='Buscar Transação...' 
@@ -59,7 +102,7 @@ export default function HomeScreen() {
           />
         </>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 

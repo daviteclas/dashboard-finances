@@ -1,4 +1,5 @@
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   Alert,
@@ -18,6 +19,8 @@ interface Transaction {
 }
 
 export default function TransactionDetailsScreen() {
+  const {theme} = useAppTheme();
+
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const transactions = useTransactionStore((state) => state.transactions);
@@ -30,7 +33,7 @@ export default function TransactionDetailsScreen() {
 
   if (!transaction) {
     return (
-      <View style={styles.centeredContainer}>
+      <View style={[styles.centeredContainer, { backgroundColor: theme.background }]}>
         <Text style={styles.errorText}>Transação não encontrada.</Text>
         <Pressable
           style={({ pressed }) => [
@@ -39,7 +42,7 @@ export default function TransactionDetailsScreen() {
           ]}
           onPress={() => router.back()}
         >
-          <Text style={styles.buttonText}>Voltar para o Início</Text>
+          <Text style={[styles.buttonText, { backgroundColor: theme.card }]}>Voltar para o Início</Text>
         </Pressable>
       </View>
     );
@@ -80,10 +83,10 @@ export default function TransactionDetailsScreen() {
   }).format(transaction.amount);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.label}>Título</Text>
-        <Text style={styles.title}>{transaction.title}</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={[styles.card, { backgroundColor: theme.card }]}>
+        <Text style={[styles.label, { color: theme.text }]}>Título</Text>
+        <Text style={[styles.title, , { color: theme.text }]}>{transaction.title}</Text>
 
         <View style={styles.divider} />
 
@@ -103,7 +106,7 @@ export default function TransactionDetailsScreen() {
         <View style={styles.divider} />
 
         <Text style={styles.label}>Data do Registro</Text>
-        <Text style={styles.date}>{transaction.date}</Text>
+        <Text style={[styles.date, { color: theme.text }]}>{transaction.date}</Text>
       </View>
 
       <Pressable
@@ -118,12 +121,12 @@ export default function TransactionDetailsScreen() {
 
       <Pressable
         style={({ pressed }) => [
-          styles.button,
+          styles.button, { backgroundColor: theme.card },
           pressed && styles.buttonPressed,
         ]}
         onPress={() => router.back()}
       >
-        <Text style={styles.buttonText}>Voltar</Text>
+        <Text style={[styles.buttonText, { color: theme.text }]}>Voltar</Text>
       </Pressable>
     </View>
   );

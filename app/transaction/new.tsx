@@ -1,4 +1,5 @@
 import { useTransactionStore } from "@/store/useTransactionStore";
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
@@ -24,6 +25,9 @@ const schema = z.object({
 type TransactionFormData = z.infer<typeof schema>;
 
 export default function NewTransactionScreen() {
+
+  const { theme } = useAppTheme();
+
   const addTransacrion = useTransactionStore((state) => state.addTransaction);
 
   const {
@@ -49,16 +53,16 @@ export default function NewTransactionScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={styles.form}>
           <View>
-            <Text style={styles.label}>Nome da Transação</Text>
+            <Text style={[styles.label, { color: theme.text }]}>Nome da Transação</Text>
             <Controller
               control={control}
               name="title"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: theme.text, backgroundColor: theme.card } ]}
                   placeholder="Ex: Almoço"
                   placeholderTextColor="#a1a1aa"
                   value={value}
@@ -73,13 +77,13 @@ export default function NewTransactionScreen() {
           </View>
 
           <View>
-            <Text style={styles.label}>Valor (R$)</Text>
+            <Text style={[styles.label, { color: theme.text }]}>Valor (R$)</Text>
             <Controller
               control={control}
               name="amount"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: theme.text, backgroundColor: theme.card } ]}
                   placeholder="0,00"
                   placeholderTextColor="#a1a1aa"
                   value={value}
@@ -94,7 +98,7 @@ export default function NewTransactionScreen() {
           </View>
 
           <View>
-            <Text style={styles.label}>Tipo de Transação</Text>
+            <Text style={[styles.label, { color: theme.text }]}>Tipo de Transação</Text>
             <Controller
               control={control}
               name="type"
@@ -102,7 +106,7 @@ export default function NewTransactionScreen() {
                 <View style={styles.segmentedControl}>
                   <Pressable
                     style={[
-                      styles.typeButton,
+                      [styles.typeButton, { backgroundColor: theme.card }],
                       value === "income" && styles.incomeActive,
                       errors.type && styles.inputError,
                     ]}
@@ -110,7 +114,7 @@ export default function NewTransactionScreen() {
                   >
                     <Text
                       style={[
-                        styles.typeButtonText,
+                        styles.typeButtonText, { color: theme.text },
                         value === "income" && styles.textActive,
                       ]}
                     >
@@ -119,7 +123,7 @@ export default function NewTransactionScreen() {
                   </Pressable>
                   <Pressable
                     style={[
-                      styles.typeButton,
+                      styles.typeButton, { backgroundColor: theme.card },
                       value === "expense" && styles.expenseActive,
                       errors.type && styles.inputError,
                     ]}
@@ -127,7 +131,7 @@ export default function NewTransactionScreen() {
                   >
                     <Text
                       style={[
-                        styles.typeButtonText,
+                        styles.typeButtonText, { color: theme.text },
                         value === "expense" && styles.textActive,
                       ]}
                     >
@@ -150,7 +154,7 @@ export default function NewTransactionScreen() {
           ]}
           onPress={handleSubmit(handleSave)}
         >
-          <Text style={styles.saveButtonText}>Salvar Transação</Text>
+          <Text style={[styles.saveButtonText]}>Salvar Transação</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -225,7 +229,8 @@ const styles = StyleSheet.create({
     color: "#FFFFFF", // Texto branco quando ativo
   },
   saveButton: {
-    backgroundColor: "#18181B",
+    backgroundColor: "#10B981",
+    color: '#fff',
     height: 56,
     borderRadius: 12,
     alignItems: "center",
@@ -233,7 +238,6 @@ const styles = StyleSheet.create({
     marginBottom: 20, // Distância segura da borda inferior
   },
   saveButtonText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
   },

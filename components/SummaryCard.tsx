@@ -1,3 +1,4 @@
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { useTransactionSummary } from "@/hooks/useTransactionSummary";
 import { View, Text, StyleSheet } from "react-native";
 
@@ -11,12 +12,14 @@ export function SummaryCard() {
         }).format(value);
     }
 
+    const { theme } = useAppTheme();
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.card }]}>
             <View style={styles.header}>
-                <Text style={styles.label}>Saldo Total</Text>
+                <Text style={[styles.label, { color: theme.text }]}>Saldo Total</Text>
                 <Text style={[
-                    styles.totalAmount,
+                    [styles.totalAmount, { color: theme.text }],
                     total < 0 && {color: '#ef4444'}
                 ]}>
                     {formatCurrency(total)}

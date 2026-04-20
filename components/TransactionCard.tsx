@@ -1,3 +1,4 @@
+import { useAppTheme } from "@/hooks/useAppTheme";
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 
@@ -17,16 +18,18 @@ export function TransactionCard( {title, amount, type, date, onPress}: Transacti
         currency: 'BRL',
     }).format(amount);
 
+    const { theme } = useAppTheme();
+
     return (
         <Pressable 
             style={({ pressed }) => [
-                styles.container,
+                [styles.container, { backgroundColor: theme.card, borderColor: theme.border }],
                 pressed && { opacity: 0.7 }]} 
             onPress={onPress}
         >
-            <View style={styles.infoGroup}>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.date}>{date}</Text>
+            <View style={[styles.infoGroup]}>
+                <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+                <Text style={[styles.date, { color: theme.textMuted }]}>{date}</Text>
             </View>
 
             <Text style={[ styles.amountBase, type === 'income' ? styles.incomeText : styles.expenseText ]}>
@@ -42,7 +45,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#fff',
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
@@ -59,12 +61,10 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#27272A', // Evitar preto puro (#000) cansa menos a vista
         marginBottom: 4,
     },
     date: {
         fontSize: 14,
-        color: '#A1A1AA',
     },
     amountBase: {
         fontSize: 16,
