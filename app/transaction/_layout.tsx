@@ -1,9 +1,8 @@
+import { useAppTheme } from "@/hooks/useAppTheme";
 import { Stack } from "expo-router";
 import React from "react";
-import { useAppTheme } from "@/hooks/useAppTheme";
 
 export default function TransactionLayout() {
-
   const { theme } = useAppTheme();
 
   return (

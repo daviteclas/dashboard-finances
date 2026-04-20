@@ -14,6 +14,7 @@ interface TransactionStore {
   addTransaction: (newTransaction: Omit<Transaction, "id" | "date">) => void;
   loadTransaction: () => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
+  updateTransaction: (id: string, updateData: Partial<Transaction>) => Promise<void>;
 }
 
 export const useTransactionStore = create<TransactionStore>((set) => ({
@@ -65,5 +66,17 @@ export const useTransactionStore = create<TransactionStore>((set) => ({
 
       return { transactions: novasTransacoes };
     });
+  },
+
+  updateTransaction: async (id, updateData) => {
+    set((state) => {
+      const novasTransacoes = state.transactions.map((t) => 
+        t.id === id ? { ...t, ...updateData } : t
+      );
+
+      AsyncStorage.setItem('@meu_dashboard_transactions', JSON.stringify(novasTransacoes));
+
+      return { transactions: novasTransacoes }
+    })
   },
 }));

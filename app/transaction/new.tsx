@@ -1,16 +1,17 @@
-import { useTransactionStore } from "@/store/useTransactionStore";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { useTransactionStore } from "@/store/useTransactionStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router"; // <-- Adicionado Stack e Params
+import { useEffect } from "react"; // <-- Adicionado useEffect
 import { Controller, useForm } from "react-hook-form";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { z } from "zod";
 
@@ -25,25 +26,59 @@ const schema = z.object({
 type TransactionFormData = z.infer<typeof schema>;
 
 export default function NewTransactionScreen() {
-
   const { theme } = useAppTheme();
 
-  const addTransacrion = useTransactionStore((state) => state.addTransaction);
+  // 1. Puxa o ID da rota
+  const { id } = useLocalSearchParams<{ id: string }>();
+
+  // 2. Puxa TODAS as ferramentas necessárias do Zustand
+  const addTransaction = useTransactionStore((state) => state.addTransaction);
+  const updateTransaction = useTransactionStore(
+    (state) => state.updateTransaction,
+  );
+  const transactions = useTransactionStore((state) => state.transactions);
+
+  // 3. Descobre se estamos no modo de edição
+  const isEditing = !!id;
+  const transactionToEdit = transactions.find((t) => t.id === id);
 
   const {
     control,
     handleSubmit,
+    reset, // <-- Extraímos o reset para preencher o formulário
     formState: { errors },
   } = useForm<TransactionFormData>({
     resolver: zodResolver(schema),
   });
 
+  // 4. Preenche os dados automaticamente assim que a tela abre (se for edição)
+  useEffect(() => {
+    if (isEditing && transactionToEdit) {
+      reset({
+        title: transactionToEdit.title,
+        amount: transactionToEdit.amount.toString(), // Transforma o número em texto para o input
+        type: transactionToEdit.type,
+      });
+    }
+  }, [isEditing, transactionToEdit, reset]);
+
+  // 5. A nova função Inteligente de Salvar
   function handleSave(data: TransactionFormData) {
-    addTransacrion({
-      title: data.title.trim(),
-      amount: parseFloat(data.amount.replace(",", ".")),
-      type: data.type,
-    });
+    const valorTratado = parseFloat(data.amount.replace(",", "."));
+
+    if (isEditing) {
+      updateTransaction(id, {
+        title: data.title.trim(),
+        amount: valorTratado,
+        type: data.type,
+      });
+    } else {
+      addTransaction({
+        title: data.title.trim(),
+        amount: valorTratado,
+        type: data.type,
+      });
+    }
 
     router.back();
   }
@@ -54,15 +89,25 @@ export default function NewTransactionScreen() {
       style={{ flex: 1 }}
     >
       <View style={[styles.container, { backgroundColor: theme.background }]}>
+        {/* 6. Altera o título do cabeçalho dinamicamente! */}
+        <Stack.Screen
+          options={{ title: isEditing ? "Editar Transação" : "Nova Transação" }}
+        />
+
         <View style={styles.form}>
           <View>
-            <Text style={[styles.label, { color: theme.text }]}>Nome da Transação</Text>
+            <Text style={[styles.label, { color: theme.text }]}>
+              Nome da Transação
+            </Text>
             <Controller
               control={control}
               name="title"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  style={[styles.input, { color: theme.text, backgroundColor: theme.card } ]}
+                  style={[
+                    styles.input,
+                    { color: theme.text, backgroundColor: theme.card },
+                  ]}
                   placeholder="Ex: Almoço"
                   placeholderTextColor="#a1a1aa"
                   value={value}
@@ -77,13 +122,18 @@ export default function NewTransactionScreen() {
           </View>
 
           <View>
-            <Text style={[styles.label, { color: theme.text }]}>Valor (R$)</Text>
+            <Text style={[styles.label, { color: theme.text }]}>
+              Valor (R$)
+            </Text>
             <Controller
               control={control}
               name="amount"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  style={[styles.input, { color: theme.text, backgroundColor: theme.card } ]}
+                  style={[
+                    styles.input,
+                    { color: theme.text, backgroundColor: theme.card },
+                  ]}
                   placeholder="0,00"
                   placeholderTextColor="#a1a1aa"
                   value={value}
@@ -98,7 +148,9 @@ export default function NewTransactionScreen() {
           </View>
 
           <View>
-            <Text style={[styles.label, { color: theme.text }]}>Tipo de Transação</Text>
+            <Text style={[styles.label, { color: theme.text }]}>
+              Tipo de Transação
+            </Text>
             <Controller
               control={control}
               name="type"
@@ -114,7 +166,7 @@ export default function NewTransactionScreen() {
                   >
                     <Text
                       style={[
-                        styles.typeButtonText, { color: theme.text },
+                        styles.typeButtonText,
                         value === "income" && styles.textActive,
                       ]}
                     >
@@ -123,7 +175,8 @@ export default function NewTransactionScreen() {
                   </Pressable>
                   <Pressable
                     style={[
-                      styles.typeButton, { backgroundColor: theme.card },
+                      styles.typeButton,
+                      { backgroundColor: theme.card },
                       value === "expense" && styles.expenseActive,
                       errors.type && styles.inputError,
                     ]}
@@ -131,7 +184,8 @@ export default function NewTransactionScreen() {
                   >
                     <Text
                       style={[
-                        styles.typeButtonText, { color: theme.text },
+                        { color: theme.text },
+                        styles.typeButtonText,
                         value === "expense" && styles.textActive,
                       ]}
                     >
@@ -154,13 +208,17 @@ export default function NewTransactionScreen() {
           ]}
           onPress={handleSubmit(handleSave)}
         >
-          <Text style={[styles.saveButtonText]}>Salvar Transação</Text>
+          {/* 7. Texto do botão muda dependendo do modo */}
+          <Text style={[styles.saveButtonText]}>
+            {isEditing ? "Salvar Alterações" : "Salvar Transação"}
+          </Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
+// ... Os styles continuam exatamente iguais
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -175,7 +233,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "#3f3f46",
-    margin: 8
+    margin: 8,
   },
   input: {
     backgroundColor: "#fff",
@@ -186,10 +244,10 @@ const styles = StyleSheet.create({
     color: "#18181B",
     borderWidth: 1,
     borderColor: "#E4E4E7",
-    padding: 15
+    padding: 15,
   },
   inputError: {
-    borderColor: "#EF4444", // Borda vermelha para dar feedback visual de erro
+    borderColor: "#EF4444",
   },
   errorText: {
     color: "#EF4444",
@@ -199,10 +257,10 @@ const styles = StyleSheet.create({
   },
   segmentedControl: {
     flexDirection: "row",
-    gap: 12, // Espaço entre os dois botões
+    gap: 12,
   },
   typeButton: {
-    flex: 1, // Faz ambos os botões terem exatamente a mesma largura (50% cada)
+    flex: 1,
     height: 56,
     alignItems: "center",
     justifyContent: "center",
@@ -214,28 +272,27 @@ const styles = StyleSheet.create({
   typeButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#71717A", // Cinza quando inativo
+    color: "#71717A",
   },
-  // Classes Ativas
   incomeActive: {
-    backgroundColor: "#10B981", // Fundo Verde
+    backgroundColor: "#10B981",
     borderColor: "#10B981",
   },
   expenseActive: {
-    backgroundColor: "#EF4444", // Fundo Vermelho
+    backgroundColor: "#EF4444",
     borderColor: "#EF4444",
   },
   textActive: {
-    color: "#FFFFFF", // Texto branco quando ativo
+    color: "#FFFFFF",
   },
   saveButton: {
     backgroundColor: "#10B981",
-    color: '#fff',
+    color: "#fff",
     height: 56,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20, // Distância segura da borda inferior
+    marginBottom: 20,
   },
   saveButtonText: {
     fontSize: 16,

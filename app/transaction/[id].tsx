@@ -109,6 +109,19 @@ export default function TransactionDetailsScreen() {
         <Text style={[styles.date, { color: theme.text }]}>{transaction.date}</Text>
       </View>
 
+      <Pressable 
+        style={({ pressed }) => [
+          styles.buttonEdit, { color: theme.text },
+          pressed && { opacity: 0.8 },
+        ]}
+        onPress={() => {
+          // Isso navega para o formulário passando o ID pela URL!
+          router.push({ pathname: '/transaction/new', params: { id: transaction.id } });
+        }}
+      >
+        <Text style={[styles.buttonText]}>Editar</Text>
+      </Pressable>
+
       <Pressable
         style={({ pressed }) => [
           styles.deleteButton,
@@ -118,6 +131,8 @@ export default function TransactionDetailsScreen() {
       >
         <Text style={styles.deleteButtonText}>Excluir Transação</Text>
       </Pressable>
+
+      
 
       <Pressable
         style={({ pressed }) => [
@@ -223,4 +238,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  buttonEdit: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 10
+  }
 });
